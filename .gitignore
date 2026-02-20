@@ -1,0 +1,50 @@
+# =========================
+# Virtual Environment
+# =========================
+pythonfastapi/
+
+# =========================
+# Cursor / VS Code IDE
+# =========================
+.vscode/
+.cursor/
+
+# =========================
+# Environment Variables
+# =========================
+# NEVER commit your secrets!
+.env
+.env.*
+!.env.example
+
+# =========================
+# Python / FastAPI
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Pytest / Coverage (for when you write tests later)
+.pytest_cache/
+.coverage
+htmlcov/
+
+# =========================
+# Databases
+# =========================
+# Ignore local SQLite databases often used when learning FastAPI
+*.db
+*.sqlite3
+
+# =========================
+# OS Generated Files
+# =========================
+.DS_Store
+Thumbs.db
