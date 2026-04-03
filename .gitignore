@@ -53,3 +53,5 @@ Thumbs.db
 # Virtual Environment
 # =========================
 FastAPINotes/
+venv/
+.venv/

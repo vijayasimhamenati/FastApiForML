@@ -50,6 +50,11 @@ books = [
 async def get_home():
     return {"Message":"Welcome to the home page"}
 
+@app.get("/health-check")
+async def health_check():
+    return {"Health": "Success",
+        "Message" : "API server is working"}
+
 @app.get("/books")
 async def get_all_books():  
     return books 
