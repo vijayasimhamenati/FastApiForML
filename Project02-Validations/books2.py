@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Body
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional
 
 app = FastAPI()
 
@@ -20,12 +21,12 @@ class Book():
     self.price = price
 
 class BookRequest(BaseModel):
-  book_id : int
-  title : str
-  author : str
-  description : str 
-  rating : int 
-  price : float
+  book_id : Optional[int] = None
+  title : str = Field(min_length=3, max_length= 25)
+  author : str = Field(min_length= 2, max_length= 25)
+  description : str = Field(min_length=10, max_length=100)
+  rating : int = Field(lt=5, gt=0)
+  price : float = Field( gt=0)
 
 
   
@@ -52,9 +53,20 @@ async def read_all_books():
 
 @app.post("/books/create_book")
 async def create_book(book : BookRequest):
-  print(type(book))
-  books.append(Book(**book.model_dump())) # ** Unpacking the dictionary
+  # print(type(book))
+  books.append(
+    create_id(
+      Book(**book.model_dump()))) # ** Unpacking the dictionary
   return {"message": "inserted the book"}
+
+
+def create_id(book):
+  book_id = 1 if len(books) == 0 else len(books)+1
+  print(book_id)
+  book.book_id = book_id
+  return book
+
+
   
 
-# uvicorn Project02-Validations.books2:app
+# uvicorn Project02-Validations.books2:app --reload
