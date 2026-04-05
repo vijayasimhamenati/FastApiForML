@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Body
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -18,6 +19,15 @@ class Book():
     self.rating = rating
     self.price = price
 
+class BookRequest(BaseModel):
+  book_id : int
+  title : str
+  author : str
+  description : str 
+  rating : int 
+  price : float
+
+
   
 books = [Book(1,"title 1","author 1","description 1", 5,99.99 ),
          Book(2,"title 2","author 2","description 2", 4.5,85.95 ),
@@ -34,10 +44,17 @@ async def read_all_books():
   return books
 # the framework automatically handles serialization, validation, and documentation based on how you define the endpoints
 
+# @app.post("/books/create_book")
+# async def create_book(book = Body()):
+#   books.append(Book(**book)) # ** Unpacking the dictionary
+#   return {"message": "inserted the book"}
+# # create method without validation
+
 @app.post("/books/create_book")
-async def create_book(book = Body()):
-  books.append(Book(**book))
+async def create_book(book : BookRequest):
+  print(type(book))
+  books.append(Book(**book.model_dump())) # ** Unpacking the dictionary
   return {"message": "inserted the book"}
-# create method without validation
+  
 
 # uvicorn Project02-Validations.books2:app
