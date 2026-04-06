@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Body
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 
 app = FastAPI()
@@ -22,11 +22,24 @@ class Book():
 
 class BookRequest(BaseModel):
   book_id : Optional[int] = None
-  title : str = Field(min_length=3, max_length= 25)
-  author : str = Field(min_length= 2, max_length= 25)
-  description : str = Field(min_length=10, max_length=100)
-  rating : int = Field(lt=5, gt=0)
-  price : float = Field( gt=0)
+  title : str = Field(min_length=3, max_length= 25, description="title can be max of 25 characters")
+  author : str = Field(min_length= 2, max_length= 25, description="author can be of max 25 characters")
+  description : str = Field(min_length=10, max_length=100, description="description can be of maximun 100 characters")
+  rating : int = Field(le=5, gt=0, description="rating can be between 1 and 5")
+  price : float = Field( gt=0, description="price should be gt 0")
+
+  # Injects a custom JSON example directly into the Swagger UI request body
+  model_config = ConfigDict(
+    json_schema_extra= {
+      "example" : {
+        "title" : "title sample",
+        "author" : "author sample",
+        "description" : "This is a example description",
+        "rating" : 5,
+        "price" : 100
+      }
+    }
+  )
 
 
   
