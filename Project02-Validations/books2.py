@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Path, Query
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 
@@ -70,7 +70,7 @@ async def read_all_books():
 
 # searches book by id and returns the book
 @app.get("/books/{book_id}")
-async def read_book_by_id(book_id : int):
+async def read_book_by_id(book_id : int = Path(gt=0, description = "show be greater than 0")):
   for book in books :
     if book.book_id == book_id :
       return book
@@ -79,7 +79,7 @@ async def read_book_by_id(book_id : int):
   
 
 @app.get("/books/")
-async def get_books_by_rating(rating : int):
+async def get_books_by_rating(rating : int = Query(le=5, gt=0, description="rating can be between 1 and 5")):
   books_to_return= []
   for book in books:
     if book.rating >= rating :
@@ -88,7 +88,7 @@ async def get_books_by_rating(rating : int):
   return books_to_return
 
 @app.get("/books/year/")
-async def get_books_by_publication_year(publication_year: int):
+async def get_books_by_publication_year(publication_year: int = Query(ge= 2000, le= 2026, description="books publication shoyld be between 2000 and 2026")):
   books_to_return = []
   for book in books:
     if book.publish_year == publication_year:
@@ -104,7 +104,7 @@ async def create_book(book : BookRequest):
   return {"message": "inserted the book"}
 
 @app.put("/books/update_book/{book_id}")
-async def update_book_by_id(book_id : int, book :BookRequest):
+async def update_book_by_id(book :BookRequest, book_id : int = Path(gt=0, description = "show be greater than 0")):
   for i in range(len(books)):
     if books[i].book_id == book_id :
       book.book_id = book_id
@@ -114,7 +114,7 @@ async def update_book_by_id(book_id : int, book :BookRequest):
     return {"message": "No such book found"}
 
 @app.delete("/books/delete_book/{book_id}")
-async def delete_book_by_id(book_id: int):
+async def delete_book_by_id( book_id : int = Path(gt=0, description = "show be greater than 0")):
   for i in range(len(books)):
     if books[i].book_id == book_id :     
       books.pop(i)
