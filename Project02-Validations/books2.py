@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Body, Path, Query
+from fastapi import FastAPI, Body, Path, Query, HTTPException, status
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
+# from starlette import status 
 
 app = FastAPI()
 
@@ -53,11 +54,11 @@ books = [Book(1,"title 1","author 1","description 1", 5,99.99, 2002 ),
          Book(4,"title 4","author 2","description 4", 5,45.6, 2024 ),
          Book(5,"title 5","author 1","description 5", 2,120, 2023 )]
 
-@app.get("/")
+@app.get("/", status_code = status.HTTP_200_OK)
 async def health_check():
   return {"message": "Server is working"}
 
-@app.get("/books")
+@app.get("/books", status_code = status.HTTP_200_OK)
 async def read_all_books():
   return books
 # the framework automatically handles serialization, validation, and documentation based on how you define the endpoints
@@ -69,15 +70,15 @@ async def read_all_books():
 # # create method without validation
 
 # searches book by id and returns the book
-@app.get("/books/{book_id}")
+@app.get("/books/{book_id}", status_code = 200)
 async def read_book_by_id(book_id : int = Path(gt=0, description = "show be greater than 0")):
   for book in books :
     if book.book_id == book_id :
       return book
   else : 
-    return {"message": "Book not found"}
+    raise HTTPException(status_code = 404, detail = "Noo book found")
   
-
+# default status code is 200
 @app.get("/books/")
 async def get_books_by_rating(rating : int = Query(le=5, gt=0, description="rating can be between 1 and 5")):
   books_to_return= []
@@ -86,6 +87,7 @@ async def get_books_by_rating(rating : int = Query(le=5, gt=0, description="rati
       books_to_return.append(book)
 
   return books_to_return
+
 
 @app.get("/books/year/")
 async def get_books_by_publication_year(publication_year: int = Query(ge= 2000, le= 2026, description="books publication shoyld be between 2000 and 2026")):
@@ -111,7 +113,7 @@ async def update_book_by_id(book :BookRequest, book_id : int = Path(gt=0, descri
       books[i] = book
       return {"message" : "Updated"}
   else :
-    return {"message": "No such book found"}
+    raise HTTPException(status_code = 404, detail = "No such book")
 
 @app.delete("/books/delete_book/{book_id}")
 async def delete_book_by_id( book_id : int = Path(gt=0, description = "show be greater than 0")):
@@ -120,7 +122,7 @@ async def delete_book_by_id( book_id : int = Path(gt=0, description = "show be g
       books.pop(i)
       return {"message" : "deleted"}
   else :
-    return {"message": "No such book found"}
+    raise HTTPException(status_code = 404, detail = "No such book")
 
 
 def create_id(book):
