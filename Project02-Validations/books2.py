@@ -11,14 +11,16 @@ class Book():
   description : str 
   rating : int 
   price : float
+  publish_year : int
 
-  def __init__(self,book_id : int, title: str, author:str, description:str, rating:int, price:float ):
+  def __init__(self,book_id : int, title: str, author:str, description:str, rating:int, price:float, publish_year: int ):
     self.book_id = book_id
     self.title = title
     self.author = author
     self.description = description
     self.rating = rating
     self.price = price
+    self.publish_year = publish_year
 
 class BookRequest(BaseModel):
   book_id : Optional[int] = None
@@ -27,6 +29,7 @@ class BookRequest(BaseModel):
   description : str = Field(min_length=10, max_length=100, description="description can be of maximun 100 characters")
   rating : int = Field(le=5, gt=0, description="rating can be between 1 and 5")
   price : float = Field( gt=0, description="price should be gt 0")
+  publish_year : int = Field(ge= 2000, le= 2026, description="books publication shoyld be between 2000 and 2026")
 
   # Injects a custom JSON example directly into the Swagger UI request body
   model_config = ConfigDict(
@@ -36,18 +39,19 @@ class BookRequest(BaseModel):
         "author" : "author sample",
         "description" : "This is a example description",
         "rating" : 5,
-        "price" : 100
+        "price" : 100,
+        "publish_year" : 2026
       }
     }
   )
 
 
   
-books = [Book(1,"title 1","author 1","description 1", 5,99.99 ),
-         Book(2,"title 2","author 2","description 2", 4.5,85.95 ),
-         Book(3,"title 3","author 3","description 3", 4,56 ),
-         Book(4,"title 4","author 2","description 4", 5,45.6 ),
-         Book(5,"title 5","author 1","description 5", 2,120 )]
+books = [Book(1,"title 1","author 1","description 1", 5,99.99, 2002 ),
+         Book(2,"title 2","author 2","description 2", 4.5,85.95, 2005 ),
+         Book(3,"title 3","author 3","description 3", 4,56, 2024 ),
+         Book(4,"title 4","author 2","description 4", 5,45.6, 2024 ),
+         Book(5,"title 5","author 1","description 5", 2,120, 2023 )]
 
 @app.get("/")
 async def health_check():
@@ -81,6 +85,14 @@ async def get_books_by_rating(rating : int):
     if book.rating >= rating :
       books_to_return.append(book)
 
+  return books_to_return
+
+@app.get("/books/year/")
+async def get_books_by_publication_year(publication_year: int):
+  books_to_return = []
+  for book in books:
+    if book.publish_year == publication_year:
+      books_to_return.append(book)
   return books_to_return
 
 @app.post("/books/create_book")
