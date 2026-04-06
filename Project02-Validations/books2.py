@@ -47,7 +47,7 @@ books = [Book(1,"title 1","author 1","description 1", 5,99.99 ),
          Book(2,"title 2","author 2","description 2", 4.5,85.95 ),
          Book(3,"title 3","author 3","description 3", 4,56 ),
          Book(4,"title 4","author 2","description 4", 5,45.6 ),
-         Book(1,"title 5","author 1","description 5", 2,120 )]
+         Book(5,"title 5","author 1","description 5", 2,120 )]
 
 @app.get("/")
 async def health_check():
@@ -64,6 +64,25 @@ async def read_all_books():
 #   return {"message": "inserted the book"}
 # # create method without validation
 
+# searches book by id and returns the book
+@app.get("/books/{book_id}")
+async def read_book_by_id(book_id : int):
+  for book in books :
+    if book.book_id == book_id :
+      return book
+  else : 
+    return {"message": "Book not found"}
+  
+
+@app.get("/books/")
+async def get_books_by_rating(rating : int):
+  books_to_return= []
+  for book in books:
+    if book.rating >= rating :
+      books_to_return.append(book)
+
+  return books_to_return
+
 @app.post("/books/create_book")
 async def create_book(book : BookRequest):
   # print(type(book))
@@ -71,6 +90,25 @@ async def create_book(book : BookRequest):
     create_id(
       Book(**book.model_dump()))) # ** Unpacking the dictionary
   return {"message": "inserted the book"}
+
+@app.put("/books/update_book/{book_id}")
+async def update_book_by_id(book_id : int, book :BookRequest):
+  for i in range(len(books)):
+    if books[i].book_id == book_id :
+      book.book_id = book_id
+      books[i] = book
+      return {"message" : "Updated"}
+  else :
+    return {"message": "No such book found"}
+
+@app.delete("/books/delete_book/{book_id}")
+async def delete_book_by_id(book_id: int):
+  for i in range(len(books)):
+    if books[i].book_id == book_id :     
+      books.pop(i)
+      return {"message" : "deleted"}
+  else :
+    return {"message": "No such book found"}
 
 
 def create_id(book):
